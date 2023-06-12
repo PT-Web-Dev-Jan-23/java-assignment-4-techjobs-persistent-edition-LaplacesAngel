@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.swing.text.html.Option;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,21 +53,22 @@ public class HomeController {
 
     @PostMapping("add")
     public String processAddJobForm(@ModelAttribute @Valid Job newJob,
-                                       Errors errors, Model model, @RequestParam int employerId, @RequestParam List<Integer> skills) {
-
+                                       Errors errors, Model model,
+                                        @RequestParam int employerId,
+                                        @RequestParam List<Integer> skills) {
         if (errors.hasErrors()) {
             model.addAttribute("title", "Add Job");
-            return "/add";
+            return "add";
         }
-
 
         List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
-        if(skillObjs.isEmpty()){
-            model.addAttribute("title","Invalid skill id");
-        } else {
+        //if(skillObjs.isEmpty()){  - apparently this was unnecessary and was KILLING ME
+            //model.addAttribute("title","Invalid skill id");
+        //}
+        // else {
             newJob.setSkills(skillObjs);
             jobRepository.save(newJob);
-        }
+        //}
 
         Optional<Employer> result = employerRepository.findById(employerId);
         if(result.isEmpty()){
@@ -76,7 +78,6 @@ public class HomeController {
             newJob.setEmployer(employer);
             jobRepository.save(newJob);
         }
-
 
         return "redirect:";
     }
